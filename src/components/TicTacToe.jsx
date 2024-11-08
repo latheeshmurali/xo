@@ -1,5 +1,7 @@
 import Board from "./Board"
 import { useEffect, useState } from "react"
+import GameOver from "./GameOver";
+import GameState from "./GameState";
 
 const player_X = "X";
 const player_Y = "O";
@@ -20,8 +22,16 @@ const winningCombinations = [
   { combo: [2, 4, 6], strikeClass: "strike-diagonal-2" },
 ];
 
-function checkWinner() {
-  console.log("hi");
+function checkWinner(tiles,setstrikeClass) {
+  for( const {combo,strikeClass} of winningCombinations) {
+    const tileValue1 = tiles[combo[0]];
+    const tileValue2 = tiles[combo[1]];
+    const tileValue3 = tiles[combo[2]];
+
+    if(tileValue1 !== null && tileValue1 === tileValue2 && tileValue2 === tileValue3) {
+      setstrikeClass(strikeClass);
+    }
+  }
 }
 
 function TicTacToe() {
@@ -29,6 +39,7 @@ function TicTacToe() {
   const [tiles, setTiles] = useState(Array(9).fill(null));
   const [playerTurn, setplayerTurn] = useState(player_X);
   const [strikeClass, setstrikeClass] = useState();
+  const [gameState, setgameState] = useState(GameState.inProgress);
 
   const handleTileClick = (index) => {
     if(tiles[index] !== null) return;
@@ -40,13 +51,14 @@ function TicTacToe() {
   }
 
   useEffect(() => {
-    checkWinner()
+    checkWinner(tiles, setstrikeClass)
   },[tiles])
 
   return (
     <div>
       <h1>Tic Tac Toe</h1>
-      <Board playerTurn={playerTurn} tiles={tiles} onTileClick={handleTileClick} />
+      <Board strikeClass={strikeClass} playerTurn={playerTurn} tiles={tiles} onTileClick={handleTileClick} />
+      <GameOver gameState={gameState} />
     </div>
   )
 }
